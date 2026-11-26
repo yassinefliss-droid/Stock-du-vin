@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+<h1>Tableau de bord</h1>
+<div class="kpis">
+  <div class="kpi"><span>{{ valeur.bouteilles }}</span>bouteilles en stock<small>{{ valeur.references }} références</small></div>
+  <div class="kpi"><span>{{ valeur.valeur_achat | eur }}</span>valeur au prix d'achat</div>
+  <div class="kpi"><span>{{ valeur.valeur_vente | eur }}</span>valeur au prix de vente</div>
+  <div class="kpi {% if alertes %}alerte{% endif %}"><span>{{ alertes | length }}</span>produits sous le seuil</div>
+</div>
+
+<div class="carte">
+  <h2>Alertes de stock</h2>
+  {% if alertes %}
+  <table>
+    <tr><th>Produit</th><th>Millésime</th><th>Stock</th><th>Seuil</th></tr>
+    {% for x in alertes %}
+    <tr><td><a href="/produits/{{ x.produit.id }}">{{ x.produit.nom }}</a></td>
+        <td>{{ x.produit.millesime or "NM" }}</td>
+        <td class="{{ 'rupture' if x.stock == 0 else 'bas' }}">{{ x.stock }}</td>
+        <td>{{ x.produit.seuil_alerte }}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}<p>Aucune alerte. 🎉</p>{% endif %}
+</div>
+
+<div class="carte">
+  <h2>Derniers mouvements</h2>
+  <table>
+    <tr><th>Date</th><th>Produit</th><th>Type</th><th>Qté</th><th>Motif</th></tr>
+    {% for m in recents %}
+    <tr><td>{{ m.date.strftime("%d/%m/%Y") }}</td>
+        <td><a href="/produits/{{ m.product_id }}">{{ m.product.nom }} {{ m.product.millesime or "" }}</a></td>
+        <td>{{ m.type.value }}</td><td>{{ m.quantite }}</td><td>{{ m.motif }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

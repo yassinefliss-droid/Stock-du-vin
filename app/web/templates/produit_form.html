@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Nouveau produit{% endblock %}
+{% block content %}
+<h1>Nouveau produit</h1>
+<div class="carte">
+  {% if erreur %}<p class="erreur">{{ erreur }}</p>{% endif %}
+  <form method="post" class="grille">
+    <label>Référence <input name="reference" required></label>
+    <label>Nom / cuvée <input name="nom" required></label>
+    <label>Domaine / producteur <input name="domaine" required></label>
+    <label>Appellation <input name="appellation" required></label>
+    <label>Région <input name="region" required></label>
+    <label>Millésime (vide = NM) <input name="millesime" type="number" min="1900" max="2100"></label>
+    <label>Couleur
+      <select name="couleur">{% for c in Couleur %}<option>{{ c.value }}</option>{% endfor %}</select></label>
+    <label>Format <input name="format" value="75cl"></label>
+    <label>Prix d'achat (€) <input name="prix_achat" type="number" step="0.01" min="0" required></label>
+    <label>Prix de vente (€) <input name="prix_vente" type="number" step="0.01" min="0" required></label>
+    <label>Seuil d'alerte <input name="seuil_alerte" type="number" min="0" value="6"></label>
+    <button>Créer</button>
+  </form>
+</div>
+{% endblock %}

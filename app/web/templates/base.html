@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Stock en cave{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+{% if user %}
+<header>
+  <a class="brand" href="/dashboard">🍷 Stock en cave</a>
+  <nav>
+    <a href="/dashboard">Tableau de bord</a>
+    <a href="/produits">Produits</a>
+    {% if peut_ecrire %}<a href="/mouvements/nouveau">Mouvement</a>{% endif %}
+    <a href="/assistant">Assistant</a>
+    <a href="/docs" target="_blank">API</a>
+  </nav>
+  <form method="post" action="/logout" class="logout">
+    <span>{{ user.email }} ({{ user.role.value }})</span>
+    <button class="secondaire">Déconnexion</button>
+  </form>
+</header>
+{% endif %}
+<main>{% block content %}{% endblock %}</main>
+</body>
+</html>

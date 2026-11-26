@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Produits{% endblock %}
+{% block content %}
+<h1>Produits {% if peut_ecrire %}<a class="bouton" href="/produits/nouveau">+ Nouveau</a>{% endif %}</h1>
+<form method="get" class="filtres">
+  <input name="recherche" value="{{ recherche }}" placeholder="Recherche (nom, domaine, appellation, région, millésime)">
+  <select name="couleur">
+    <option value="">Toutes couleurs</option>
+    {% for c in Couleur %}<option value="{{ c.value }}" {{ 'selected' if couleur == c.value }}>{{ c.value }}</option>{% endfor %}
+  </select>
+  <label class="inline"><input type="checkbox" name="sous_seuil" value="true" {{ 'checked' if sous_seuil }}> Sous le seuil</label>
+  <button>Filtrer</button>
+</form>
+<p>{{ lignes | length }} produit(s)</p>
+<table>
+  <tr><th>Réf.</th><th>Nom</th><th>Appellation</th><th>Région</th><th>Mill.</th><th>Couleur</th><th>Achat</th><th>Vente</th><th>Stock</th></tr>
+  {% for x in lignes %}
+  <tr><td>{{ x.produit.reference }}</td>
+      <td><a href="/produits/{{ x.produit.id }}">{{ x.produit.nom }}</a></td>
+      <td>{{ x.produit.appellation }}</td><td>{{ x.produit.region }}</td>
+      <td>{{ x.produit.millesime or "NM" }}</td><td>{{ x.produit.couleur.value }}</td>
+      <td>{{ x.produit.prix_achat | eur }}</td><td>{{ x.produit.prix_vente | eur }}</td>
+      <td class="{{ 'rupture' if x.stock == 0 else ('bas' if x.stock <= x.produit.seuil_alerte) }}">{{ x.stock }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

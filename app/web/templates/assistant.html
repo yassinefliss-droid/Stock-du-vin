@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Assistant{% endblock %}
+{% block content %}
+<h1>Assistant</h1>
+<div class="carte">
+  <form method="post" class="ligne">
+    <input name="question" value="{{ question or '' }}" required maxlength="500"
+           placeholder="Posez une question sur le stock…">
+    <button>Demander</button>
+  </form>
+  <p class="aide">Exemples : « Combien de bouteilles de Saint-Émilion 2018 reste-t-il ? » ·
+     « Quels vins sont sous le seuil d'alerte ? » · « Quelle est la valeur du stock de blancs ? » ·
+     « Quelles ont été les sorties de la semaine dernière ? »</p>
+</div>
+{% if reponse %}
+<div class="carte">
+  <h2>Réponse</h2>
+  <p class="reponse">{{ reponse.texte }}</p>
+  <p class="aide">Mode : {{ reponse.mode }}
+    {% for o in reponse.outils %} · outil <code>{{ o.nom }}</code> {{ o.arguments }}{% endfor %}</p>
+</div>
+{% endif %}
+{% endblock %}

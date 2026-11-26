@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ produit.nom }}{% endblock %}
+{% block content %}
+<h1>{{ produit.nom }} {{ produit.millesime or "" }}</h1>
+<div class="carte">
+  <dl>
+    <dt>Référence</dt><dd>{{ produit.reference }}</dd>
+    <dt>Domaine</dt><dd>{{ produit.domaine }}</dd>
+    <dt>Appellation</dt><dd>{{ produit.appellation }} — {{ produit.region }}</dd>
+    <dt>Couleur / format</dt><dd>{{ produit.couleur.value }} / {{ produit.format }}</dd>
+    <dt>Prix achat / vente</dt><dd>{{ produit.prix_achat | eur }} / {{ produit.prix_vente | eur }}</dd>
+    <dt>Stock actuel</dt>
+    <dd><strong class="{{ 'rupture' if stock == 0 else ('bas' if stock <= produit.seuil_alerte) }}">{{ stock }}</strong>
+        (seuil d'alerte : {{ produit.seuil_alerte }})</dd>
+  </dl>
+  {% if peut_ecrire %}<a class="bouton" href="/mouvements/nouveau?product_id={{ produit.id }}">Enregistrer un mouvement</a>{% endif %}
+</div>
+<div class="carte">
+  <h2>Historique des mouvements</h2>
+  <table>
+    <tr><th>Date</th><th>Type</th><th>Quantité</th><th>Motif</th><th>Utilisateur</th></tr>
+    {% for m in mouvements %}
+    <tr><td>{{ m.date.strftime("%d/%m/%Y %H:%M") }}</td><td>{{ m.type.value }}</td>
+        <td>{{ m.quantite }}</td><td>{{ m.motif }}</td><td>{{ m.user.email if m.user else "—" }}</td></tr>
+    {% else %}<tr><td colspan="5">Aucun mouvement.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
