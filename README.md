@@ -12,20 +12,51 @@ Projet de portfolio : un outil interne simple, testé (57 tests), documenté, av
 
 ## Architecture
 
+```mermaid
+flowchart TB
+    nav(["👤 Navigateur"])
+    cli(["💻 Client API"])
+    st["Interface Streamlit<br/><small>streamlit_app/</small>"]
+
+    subgraph app["Application FastAPI"]
+        web["Interface web Jinja2<br/><small>app/web</small>"]
+        api["API REST<br/><small>app/api</small>"]
+
+        subgraph ia["Assistant en français — app/assistant"]
+            agent{"Mode ?"}
+            llm["Mode LLM<br/>le modèle choisit un outil"]
+            rules["Mode none<br/>mots-clés"]
+            tools["Outils Python déterministes<br/><small>tools.py</small>"]
+        end
+
+        services["Services métier — app/services<br/>stock calculé · jamais négatif · historique"]
+        orm["SQLAlchemy 2"]
+    end
+
+    fournisseur[/"Anthropic ou Groq"/]
+    db[("PostgreSQL<br/><small>SQLite en local et pour les tests</small>")]
+
+    nav --> web
+    nav --> st
+    cli --> api
+    st -- HTTP --> api
+
+    web --> agent
+    api --> agent
+    agent --> llm
+    agent --> rules
+    llm <-. tool calling .-> fournisseur
+    llm --> tools
+    rules --> tools
+
+    web --> services
+    api --> services
+    tools -- lecture seule --> services
+    services --> orm
+    orm --> db
 ```
- Navigateur ──► Interface web (Jinja2, app/web) ─┐
- Client API ──► API REST FastAPI (app/api) ──────┤
-                                                  ▼
-                             Services métier (app/services)
-                       stock calculé, règle « jamais négatif », historique
-                                                  ▲
- Question FR ─► Assistant (app/assistant)         │ lecture seule
-                 ├─ mode LLM  : le modèle CHOISIT un outil (tool calling)
-                 ├─ mode none : mots-clés → même outil
-                 └─ Outils Python déterministes ──┘
-                                                  ▼
-                              SQLAlchemy 2 ─► PostgreSQL (SQLite pour les tests)
-```
+
+Les routes web et API utilisent aussi SQLAlchemy directement pour certaines opérations simples (produits, comptes).
 
 ```
 app/
@@ -34,8 +65,8 @@ app/
   api/         routes REST (auth, produits, mouvements, stock, utilisateurs, assistant)
   assistant/   tools.py (outils), rules.py (mode règles), llm.py (Anthropic/Groq), agent.py
   web/         routes + templates Jinja2 + CSS
-streamlit_app/ interface Streamlit (client de l'API)
   seed.py      données de démonstration
+streamlit_app/ interface Streamlit (client de l'API)
 alembic/       migrations      tests/  pytest      eval/  évaluation de l'assistant
 ```
 
